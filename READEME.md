@@ -62,6 +62,29 @@ Os logs serão apresentados no console filtrados de acordo com os padrões espec
 - **Permissões de Acesso**: Verifique se o arquivo kubeconfig tem as permissões corretas e se você tem permissões suficientes para acessar os logs dos pods.
 - **Validação de Entrada**: Certifique-se de que todas as entradas estão corretas e que os nomes dos namespaces e pods existem no cluster.
 
+### Estrutura do Projeto
+
+```
+/
+├── cmd
+│   └── main.go
+├── internal
+│   ├── config
+│   │   └── config.go
+│   ├── kubernetes
+│   │   └── client.go
+│   ├── logs
+│   │   ├── fetcher.go
+│   │   └── filter.go
+│   └── util
+│       └── regex.go
+├── go.mod
+├── go.sum
+└── README.md
+```
+
 ## Contribuindo
 
 Contribuições para o projeto são bem-vindas! Sinta-se livre para clonar, modificar e enviar pull requests. Para bugs, questões ou sugestões, por favor abra uma issue no repositório do GitHub.
+
+
