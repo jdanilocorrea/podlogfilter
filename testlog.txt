@@ -1,0 +1,5 @@
+Escolher contexto de configuração:
+[1] ~/.kube/config
+[2] ~/.k3s/k3s.yaml
+[3] Outro
+Escolha uma opção: 

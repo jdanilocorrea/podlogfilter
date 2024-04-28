@@ -1,17 +1,9 @@
 package util
 
 import (
-	"bufio"
-	"fmt"
 	"regexp"
 	"strings"
 )
-
-func ReadInput(reader *bufio.Reader, prompt string) string {
-	fmt.Print(prompt)
-	input, _ := reader.ReadString('\n')
-	return strings.TrimSpace(input)
-}
 
 func BuildRegexPattern(patterns []string) string {
 	var regexParts []string

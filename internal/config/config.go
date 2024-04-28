@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -15,19 +16,17 @@ func ChooseKubeConfig(reader *bufio.Reader) string {
 	fmt.Print("Escolha uma opção: ")
 
 	choice, _ := reader.ReadString('\n')
-	choice = strings.TrimSpace(choice)
-
-	switch choice {
+	switch strings.TrimSpace(choice) {
 	case "1":
-		return os.ExpandEnv("$HOME/.kube/config")
+		return filepath.Join(os.Getenv("HOME"), ".kube", "config")
 	case "2":
-		return os.ExpandEnv("$HOME/.k3s/k3s.yaml")
+		return filepath.Join(os.Getenv("HOME"), ".k3s", "k3s.yaml")
 	case "3":
 		fmt.Print("Digite o caminho completo do arquivo kubeconfig: ")
 		path, _ := reader.ReadString('\n')
 		return strings.TrimSpace(path)
 	default:
 		fmt.Println("Opção inválida, usando configuração padrão ~/.kube/config")
-		return os.ExpandEnv("$HOME/.kube/config")
+		return filepath.Join(os.Getenv("HOME"), ".kube", "config")
 	}
 }

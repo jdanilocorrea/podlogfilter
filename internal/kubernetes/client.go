@@ -5,14 +5,10 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func NewClient(kubeconfigPath string) *kubernetes.Clientset {
+func NewClient(kubeconfigPath string) (*kubernetes.Clientset, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
-		panic("Falha ao construir kubeconfig: " + err.Error())
+		return nil, err
 	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic("Falha ao criar cliente Kubernetes: " + err.Error())
-	}
-	return clientset
+	return kubernetes.NewForConfig(config)
 }
