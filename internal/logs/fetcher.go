@@ -6,57 +6,30 @@ import (
 	"fmt"
 	"strings"
 
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1" // Uso de corev1 para tipos principais
+	// Uso de metav1 para metadados
 	"k8s.io/client-go/kubernetes"
 )
 
-// GetPodLogsForAllContainers obtém os logs de todos os contêineres de um pod específico.
-func GetPodLogsForAllContainers(clientset *kubernetes.Clientset, namespace, podName string) ([]string, error) {
-	// Pega as informações do pod especificado.
-	pod, err := clientset.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("error fetching pod info: %w", err)
-	}
-
-	var logs []string
-	for _, container := range pod.Spec.Containers {
-		log, err := fetchLogForContainer(clientset, namespace, podName, container.Name)
-		if err != nil {
-			// Se não conseguir pegar os logs de um contêiner, adiciona a mensagem de erro na lista de logs
-			logs = append(logs, fmt.Sprintf("Error retrieving logs for container %s: %v", container.Name, err))
-			continue
-		}
-		logs = append(logs, log)
-	}
-
-	return logs, nil
-}
-
-// fetchLogForContainer obtém os logs de um contêiner específico.
+// fetchLogForContainer obtém os logs de um contêiner específico em um pod.
 func fetchLogForContainer(clientset *kubernetes.Clientset, namespace, podName, containerName string) (string, error) {
-	// Configuração das opções de logs.
-	logOptions := &corev1.PodLogOptions{Container: containerName}
+	logOptions := &corev1.PodLogOptions{Container: containerName} // Usando corev1.PodLogOptions
+	logRequest := clientset.CoreV1().Pods(namespace).GetLogs(podName, logOptions)
 
-	// Cria a requisição de logs para o contêiner.
-	req := clientset.CoreV1().Pods(namespace).GetLogs(podName, logOptions)
-
-	// Captura o stream de logs.
-	podLogs, err := req.Stream(context.TODO())
+	logStream, err := logRequest.Stream(context.Background())
 	if err != nil {
-		return "", fmt.Errorf("error in opening stream for container %s: %w", containerName, err)
+		return "", fmt.Errorf("error opening log stream for container %s in pod %s: %v", containerName, podName, err)
 	}
-	defer podLogs.Close()
+	defer logStream.Close()
 
-	// Lê os logs e os concatena em uma string.
-	scanner := bufio.NewScanner(podLogs)
-	var sb strings.Builder
+	scanner := bufio.NewScanner(logStream)
+	var logBuilder strings.Builder
 	for scanner.Scan() {
-		sb.WriteString(scanner.Text() + "\n")
+		logBuilder.WriteString(scanner.Text() + "\n")
 	}
 	if err := scanner.Err(); err != nil {
-		return "", fmt.Errorf("error reading log for container %s: %w", containerName, err)
+		return "", fmt.Errorf("error reading log for container %s in pod %s: %v", containerName, podName, err)
 	}
 
-	return sb.String(), nil
+	return logBuilder.String(), nil
 }

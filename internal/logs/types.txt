@@ -1,0 +1,15 @@
+package logs
+
+import (
+	"time"
+)
+
+// func CreateLogEntry(statusCode int, method, path, details string) LogEntry {
+// 	return LogEntry{
+// 		Timestamp:  time.Now().Format(time.RFC3339), // Captura o momento atual e formata em RFC3339
+// 		StatusCode: statusCode,
+// 		Method:     method,
+// 		Path:       path,
+// 		Details:    details,
+// 	}
+// }
